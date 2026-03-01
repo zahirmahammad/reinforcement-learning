@@ -150,5 +150,5 @@ if __name__ == "__main__":
     reinforce = MCReinforce("LunarLander-v3")
     reinforce.ShowEnvInfo()
     reinforce.TakeRandomActions()
-    policy, scores = reinforce.ReinforceAlgo(n_episodes=5000, max_steps=1000, gamma=0.99, lr=1e-2, device='cpu')
+    policy, scores = reinforce.ReinforceAlgo(n_episodes=5000, max_steps=200, gamma=0.99, lr=1e-2, device='cpu')
     reinforce.EvaluatePolicy(num_episodes=10, max_steps=1000)
