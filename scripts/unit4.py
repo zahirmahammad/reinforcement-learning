@@ -28,14 +28,11 @@ class PolicyNetwork(nn.Module):
         return action.item(), m.log_prob(action)
 
 
-
 class MCReinforce:
     def __init__(self, env_name):
         self.env_name = env_name
         self.env = gym.make(self.env_name, render_mode='rgb_array')
  
-
-
     def ShowEnvInfo(self):
         print(f"Environment Information: {self.env_name}")
         print(f"---------------------------------------------------")
@@ -106,6 +103,11 @@ class MCReinforce:
 
             if i % 50 == 0:
                 print(f"Episode: {i} \t Average Score: {np.mean(score_deque):.2f}")
+
+            if max(score_deque)>0 and len(score_deque)>1 and len(set(score_deque)) == 1:  # checks if all the elements in score_deque is same
+                print("Max reward acheived!!")
+                print("Stopping training....")
+                break
             
         return self.policy, scores
 
@@ -131,11 +133,24 @@ class MCReinforce:
         std_reward = np.std(ep_rewards)
         self.eval_env.close()
         
-        imageio.mimsave(f"{self.env_name}.gif", frames, fps=30, loop=True)
+        imageio.mimsave(f"media/{self.env_name}.gif", frames, fps=30, loop=True)
         return mean_reward, std_reward
 
 
+# ---- Practice Environments ----
+# Image based state
+class MCReinforce2:
+    def __init__(self):
+        pass
 
+
+class CNNPolicyNetwork(nn.Module):
+    def __init__(self, input_ch, output_actions):
+        super(CNNPolicyNetwork, self).__init__()
+        self.conv1 = nn.Conv2d(3, 32, kernel_size=8, stride=4)
+        self.conv2 = nn.Conv2d(32, 64, kernel_size=4, stride=2)
+        self.conv3 = nn.Conv2d(64, 64, kernel_size=2, stride=1)
+        # self.fc1 = nn.Linear(64 *)
 
 
 
@@ -144,11 +159,17 @@ if __name__ == "__main__":
     # reinforce = MCReinforce("CartPole-v1")
     # reinforce.ShowEnvInfo()
     # reinforce.TakeRandomActions()
+    # policy, scores = reinforce.ReinforceAlgo(n_episodes=8000, max_steps=1000, gamma=0.99, lr=1e-2, device='cpu')
+    # reinforce.EvaluatePolicy(num_episodes=10, max_steps=1000)
+
+    # reinforce = MCReinforce("LunarLander-v3")
+    # reinforce.ShowEnvInfo()
+    # reinforce.TakeRandomActions()
     # policy, scores = reinforce.ReinforceAlgo(n_episodes=5000, max_steps=1000, gamma=0.99, lr=1e-2, device='cpu')
     # reinforce.EvaluatePolicy(num_episodes=10, max_steps=1000)
 
-    reinforce = MCReinforce("LunarLander-v3")
+    reinforce = MCReinforce("Acrobot-v1")
     reinforce.ShowEnvInfo()
     reinforce.TakeRandomActions()
-    policy, scores = reinforce.ReinforceAlgo(n_episodes=5000, max_steps=200, gamma=0.99, lr=1e-2, device='cpu')
+    reinforce.ReinforceAlgo(n_episodes=10000, max_steps=1000, gamma=0.99, lr=1e-2, device='cpu')
     reinforce.EvaluatePolicy(num_episodes=10, max_steps=1000)
