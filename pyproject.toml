@@ -5,8 +5,10 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
-    "gymnasium[box2d]>=1.2.3",
+    "gymnasium[box2d,mujoco]>=1.2.3",
     "imageio>=2.37.2",
+    "numpy>=2.2.6",
+    "opencv-python>=4.13.0.92",
     "swig>=4.4.1",
     "torch>=2.10.0",
 ]
