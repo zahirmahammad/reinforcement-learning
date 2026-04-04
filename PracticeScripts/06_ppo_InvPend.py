@@ -213,7 +213,7 @@ class PPO_BiPedWalker:
                     obs, info = self.eval_env.reset()
                     break
             print(f"Eval Episode: {i}, Total Reward: {total_reward}")
-        imageio.mimsave(f"media/06_ppo_InvertedPendulum_test.gif", frames, fps=30, loop=True)
+        imageio.mimsave(f"media/06_ppo_InvertedPendulum.gif", frames, fps=30, loop=True)
 
 
             

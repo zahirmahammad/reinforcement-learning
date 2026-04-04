@@ -3,13 +3,13 @@ import torch.nn as nn
 import imageio
 import numpy as np
 import gymnasium as gym
-
+import cv2
 
 NUM_ENVS = 6
 NUM_STEPS = 150
 TOTAL_TIMESTEPS = 1e6
 GAMMA = 0.99
-LR = 2.5e-4
+LR = 3e-4
 DEVICE = 'cpu'
 NUM_BATCHES = 3     # depends on NUM_STEPS
 UPDATE_EPOCHS = 5
@@ -121,7 +121,7 @@ class PPO_BiPedWalker:
 
                 self.obs_arr[step] = obs
                 self.dones_arr[step] = done
-                obs, reward, terminated, truncated, info = self.vec_env.step(action)
+                obs, reward, terminated, truncated, info = self.vec_env.step(action.cpu().numpy())
                 obs = torch.tensor(obs).to(DEVICE)
                 done = np.logical_or(terminated, truncated)
                 done = [int(i) for i in done]
@@ -188,10 +188,10 @@ class PPO_BiPedWalker:
         print("----------------------------------")
         print(f"Agent Performance Test")
         print("----------------------------------")   
-        obs, info = self.eval_env.reset()
         frames = []
         for i in range(num_eval_episodes):
             total_reward = 0
+            obs, info = self.eval_env.reset()
             for _ in range(NUM_STEPS):
                 obs = torch.tensor(obs).to(DEVICE).unsqueeze(0)
                 action, log_prob, ent, value = self.agent.get_action_and_value(obs)
@@ -199,12 +199,17 @@ class PPO_BiPedWalker:
                 obs, reward, terminated, truncated, info = self.eval_env.step(action.cpu().numpy())
                 total_reward += reward
                 frame = self.eval_env.render()
+                frame = (frame * 255).astype('uint8') if frame.dtype != 'uint8' else frame
+                frame = np.ascontiguousarray(frame)
+                cv2.putText(frame, f"Episode: {i}", (20, 40),
+                            cv2.FONT_HERSHEY_SIMPLEX, 1,
+                            (255,255,255), 2, cv2.LINE_AA)
                 frames.append(frame)
                 if terminated or truncated:
                     obs, info = self.eval_env.reset()
                     break
             print(f"Eval Episode: {i}, Total Reward: {total_reward}")
-        imageio.mimsave(f"media/06_ppo_BiPedalWalker.gif", frames, fps=30, loop=True)
+        imageio.mimsave(f"media/06_ppo_BiPedalWalker_test.gif", frames, fps=30, loop=True)
 
 
             
